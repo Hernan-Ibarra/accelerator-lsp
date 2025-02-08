@@ -1,2 +1,2 @@
-# accelerator-lsp
-This is an language server I built for educational purposes. 
+# acceleratorLSP-lsp
+This is an language server I built for educational purposes.

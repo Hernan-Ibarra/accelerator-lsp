@@ -1,0 +1,2 @@
+rootProject.name = "acceleratorLSP-lsp"
+
