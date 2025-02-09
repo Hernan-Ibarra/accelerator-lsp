@@ -4,6 +4,7 @@
   "description": "This is an language server I built for educational purposes.",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -rf dist",
     "build": "tsc",
     "start": "node dist/main.js",
     "test": "jest"
