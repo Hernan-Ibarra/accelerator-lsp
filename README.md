@@ -10,8 +10,9 @@ This repository is the server side. You can, in theory, connect it to any editor
 
 ## Instructions
 
-<!--TODO: Add instructions on how to connect to Neovim-->
-<!--TODO: Add instructions on how to build, use, and test-->
+<!-- TODO: Add instructions on how to connect to Neovim-->
+<!-- TODO: Add instructions on how to build, use, and test-->
+
 You will have to find out on how your editor/IDE connects to language servers on your own.
 
 ## Additional Resources
