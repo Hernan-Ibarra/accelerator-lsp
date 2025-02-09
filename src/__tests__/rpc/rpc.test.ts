@@ -1,18 +1,16 @@
 import { decodeMessage, encodeMessage } from "../../rpc/rpc";
 
-interface encodingExample {
-  Testing: boolean;
-}
-
 test("Encoding works correctly", () => {
-  const example: encodingExample = {
-    Testing: true
+  const example: Record<string, boolean> = {
+    Testing: true,
   };
-  expect(encodeMessage(example)).toBe("Content-Length: 16\r\n\r\n{\"Testing\":true}");
+  expect(encodeMessage(example)).toBe(
+    'Content-Length: 16\r\n\r\n{"Testing":true}',
+  );
 });
 
 test("Decoding works correctly", () => {
-  const incomingMessage = "Content-Length: 15\r\n\r\n{\"method\":\"hi\"}";
+  const incomingMessage = 'Content-Length: 15\r\n\r\n{"method":"hi"}';
   const decodedMessage = decodeMessage(incomingMessage);
   const messageLength = JSON.stringify(decodedMessage).length;
 
