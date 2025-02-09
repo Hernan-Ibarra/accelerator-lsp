@@ -2,20 +2,26 @@
   "name": "accelerator-lsp",
   "version": "1.0.0",
   "description": "This is an language server I built for educational purposes.",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "clean": "rm -rf dist",
     "build": "tsc",
     "start": "node dist/main.js",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint_d ."
   },
   "keywords": [],
   "author": "Hernan Ibarra Mejia",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^9.20.0",
     "@types/jest": "^29.5.14",
+    "eslint": "^9.20.0",
+    "eslint_d": "^14.3.0",
+    "globals": "^15.14.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.23.0"
   }
 }
