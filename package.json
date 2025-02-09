@@ -1,0 +1,20 @@
+{
+  "name": "accelerator-lsp",
+  "version": "1.0.0",
+  "description": "This is an language server I built for educational purposes.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "Hernan Ibarra Mejia",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.3"
+  }
+}
