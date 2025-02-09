@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EncodeMessage = void 0;
-const EncodeMessage = (msg) => {
+exports.encodeMessage = void 0;
+const encodeMessage = (msg) => {
     const content = JSON.stringify(msg);
     const contentLength = content.length;
     return `Content-Length: ${contentLength}\r\n\r\n${content}`;
 };
-exports.EncodeMessage = EncodeMessage;
+exports.encodeMessage = encodeMessage;

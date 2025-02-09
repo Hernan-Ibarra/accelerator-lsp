@@ -1,12 +1,12 @@
-import { EncodeMessage } from "../../rpc/rpc";
+import { encodeMessage } from "../../rpc/rpc";
 
-interface EncodingExample {
+interface encodingExample {
   Testing: boolean;
 }
 
 test("Encoding works correctly", () => {
-  const example: EncodingExample = {
+  const example: encodingExample = {
     Testing: true
   };
-  expect(EncodeMessage(example)).toBe("Content-Length: 16\r\n\r\n{\"Testing\":true}");
+  expect(encodeMessage(example)).toBe("Content-Length: 16\r\n\r\n{\"Testing\":true}");
 });

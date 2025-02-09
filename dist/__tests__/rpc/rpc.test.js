@@ -5,5 +5,5 @@ test("Encoding works correctly", () => {
     const example = {
         Testing: true
     };
-    expect((0, rpc_1.EncodeMessage)(example)).toBe("Content-Length: 16\r\n\r\n{\"Testing\":true}");
+    expect((0, rpc_1.encodeMessage)(example)).toBe("Content-Length: 16\r\n\r\n{\"Testing\":true}");
 });
