@@ -1,23 +1,18 @@
-// Create a function that reads from stdin and writes to stdout
-function processInput(): void {
-  const stdin = process.stdin;
-  const stdout = process.stdout;
+import { handleMessage } from "./lsp/handleMessage";
+import { MessageQueue } from "./rpcUtilities/messages";
+import { decodeStdin } from "./rpcUtilities/parsing";
 
-  // Set up to read from stdin
-  stdin.setEncoding("utf8");
+const main = (): void => {
+  const parsedMessages = new MessageQueue();
 
-  // Once the data is received, print it out
-  stdin.on("data", (input) => {
-    stdout.write(`You typed: ${input}`);
-  });
+  decodeStdin(parsedMessages);
 
-  // Handle EOF (Ctrl+D) for stdin
-  stdin.on("end", () => {
-    stdout.write("End of input\n");
-  });
+  while (true) {
+    const msg = parsedMessages.dequeue();
+    if (msg) {
+      handleMessage(msg);
+    }
+  }
+};
 
-  stdout.write("Please type something: ");
-}
-
-// Call the function
-processInput();
+main();
