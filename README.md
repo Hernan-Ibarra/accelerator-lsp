@@ -10,10 +10,21 @@ This repository is the server side. You can, in theory, connect it to any editor
 
 ## Instructions
 
-<!-- TODO: Add instructions on how to connect to Neovim-->
-<!-- TODO: Add instructions on how to build, use, and test-->
+After cloning this repository, build the project by running
 
-You will have to find out on how your editor/IDE connects to language servers on your own.
+```bash
+  npm run build
+```
+
+You will have to find out on how your favourite editor/IDE connects to language servers on your own. The server can be started by running
+
+```bash
+  npm run --silent start
+```
+
+This will read stdin, waiting for the JSON files, and will reply via stdout. (The `--silent` flag is important, because otherwise some logs might leak to stoud).
+
+TODO: Add instructions on how to connect to Neovim
 
 ## Additional Resources
 
