@@ -6,6 +6,7 @@
   "scripts": {
     "clean": "rm -rI dist",
     "build": "tsc",
+    "rebuild": "npm run clean && npm run build",
     "start": "node dist/main.js",
     "test": "jest",
     "lint": "eslint_d .",
