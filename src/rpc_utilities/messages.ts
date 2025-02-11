@@ -1,15 +1,16 @@
-export interface Message {
+export interface RequestMessage {
+  id: number;
   method: string;
 }
 
 export class MessageQueue {
-  private messages: Message[] = [];
+  private messages: RequestMessage[] = [];
 
-  enqueue(message: Message): void {
+  enqueue(message: RequestMessage): void {
     this.messages.push(message);
   }
 
-  dequeue(): Message | undefined {
+  dequeue(): RequestMessage | undefined {
     return this.messages.shift();
   }
 
@@ -17,7 +18,7 @@ export class MessageQueue {
     return this.messages.length === 0;
   }
 
-  peek(): Message | undefined {
+  peek(): RequestMessage | undefined {
     return !this.isEmpty() ? this.messages[0] : undefined;
   }
 

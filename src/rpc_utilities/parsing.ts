@@ -1,7 +1,10 @@
 import { EventEmitter } from "events";
-import { Message, MessageQueue } from "./messages";
+import { RequestMessage, MessageQueue } from "./messages";
 
-export const decodeStdin = (queue: MessageQueue, emitter: EventEmitter) => {
+export const decodeStdin = (
+  queue: MessageQueue,
+  emitter: EventEmitter,
+): void => {
   interface StreamState {
     unprocessedBytes: Buffer;
     numberOfBytesExpected?: number;
@@ -47,7 +50,7 @@ export const decodeStdin = (queue: MessageQueue, emitter: EventEmitter) => {
   });
 };
 
-type AttemptToGetContentLength =
+export type AttemptToGetContentLength =
   | {
       wasSuccesful: true;
       result: number;
@@ -55,7 +58,9 @@ type AttemptToGetContentLength =
     }
   | { wasSuccesful: false };
 
-const getContentLength = (messageBytes: Buffer): AttemptToGetContentLength => {
+export const getContentLength = (
+  messageBytes: Buffer,
+): AttemptToGetContentLength => {
   const delimiter = Buffer.from("\r\n\r\n", "utf8");
   const index = messageBytes.indexOf(delimiter);
 
@@ -75,12 +80,28 @@ const getContentLength = (messageBytes: Buffer): AttemptToGetContentLength => {
   };
 };
 
-const parseMessage = (contentBytes: Buffer): Message => {
+export const parseMessage = (contentBytes: Buffer): RequestMessage => {
   const content = JSON.parse(contentBytes.toString("utf8"));
+
+  if (typeof content.id !== "number") {
+    throw new Error("The 'id' property is missing or is not a number.");
+  }
 
   if (typeof content.method !== "string") {
     throw new Error("The 'method' property is missing or is not a string.");
   }
 
   return content;
+};
+
+export const encodeMessage = (msg: Record<string, unknown>): Buffer => {
+  const content = JSON.stringify(msg);
+  const contentBytes = Buffer.from(content, "utf8");
+
+  const header = `Content-Length: ${contentBytes.length}`;
+  const headerBytes = Buffer.from(header, "utf8");
+
+  const separatingBytes = Buffer.from("\r\n\r\n", "utf8");
+
+  return Buffer.concat([headerBytes, separatingBytes, contentBytes]);
 };
