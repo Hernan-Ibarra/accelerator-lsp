@@ -1,4 +1,4 @@
-import { Message } from "../rpcUtilities/messages";
+import { Message } from "../rpc_utilities//messages";
 
 export const handleMessage = (msg: Message) => {
   process.stdout.write("I received your message!");

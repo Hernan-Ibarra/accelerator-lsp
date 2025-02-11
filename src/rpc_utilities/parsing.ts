@@ -1,6 +1,7 @@
+import { EventEmitter } from "events";
 import { Message, MessageQueue } from "./messages";
 
-export const decodeStdin = (queue: MessageQueue) => {
+export const decodeStdin = (queue: MessageQueue, emitter: EventEmitter) => {
   interface StreamState {
     unprocessedBytes: Buffer;
     numberOfBytesExpected?: number;
@@ -39,6 +40,7 @@ export const decodeStdin = (queue: MessageQueue) => {
     );
 
     queue.enqueue(parsedMessage);
+    emitter.emit("messageEnqueued");
 
     streamState.unprocessedBytes = bytesToProcess.subarray(contentLength);
     streamState.numberOfBytesExpected = undefined;
@@ -63,13 +65,13 @@ const getContentLength = (messageBytes: Buffer): AttemptToGetContentLength => {
 
   const headerBytes = messageBytes.subarray(0, index);
   const header = headerBytes.toString("utf8");
-  const contentLengthString = header.slice("Content-Length ".length);
+  const contentLengthString = header.slice("Content-Length: ".length);
   const contentLength = parseInt(contentLengthString);
 
   return {
     wasSuccesful: true,
     result: contentLength,
-    contentBytes: messageBytes.subarray(index),
+    contentBytes: messageBytes.subarray(index + delimiter.length),
   };
 };
 
