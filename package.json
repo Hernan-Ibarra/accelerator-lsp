@@ -4,14 +4,14 @@
   "description": "This is an language server I built for educational purposes.",
   "main": "main.js",
   "scripts": {
-    "clean": "rm -rI dist",
+    "clean": "echo \"We now delete the cache from previous compilations\" && rm -frI dist && echo \"We now delete previous logs\" && rm -frI logs/*",
     "build": "tsc",
     "rebuild": "npm run clean && npm run build",
     "start": "node dist/main.js",
     "test": "jest",
     "lint": "eslint_d .",
     "build-and-test": "npm run build && npm run lint && npm run test",
-    "rebuild-and-test": "npm run clean && npm run build && npm run lint && npm run test"
+    "rebuild-and-test": "npm run rebuild && npm run lint && npm run test"
   },
   "keywords": [],
   "author": "Hernan Ibarra Mejia",
