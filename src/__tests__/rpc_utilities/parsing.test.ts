@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { MessageQueue } from "../../rpc_utilities/messages";
+import { MessageQueue } from "../../lsp/messages";
 import {
   AttemptToGetContentLength,
   decodeStdin,

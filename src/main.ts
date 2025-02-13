@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { handleMessage } from "./lsp/handleMessage";
-import { MessageQueue } from "./rpc_utilities/messages";
+import { MessageQueue } from "./lsp/messages";
 import { decodeStdin } from "./rpc_utilities/parsing";
 import { MessageLogger } from "./logging/loggers";
 

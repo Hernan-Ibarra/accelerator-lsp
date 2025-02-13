@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { Message } from "../rpc_utilities/messages";
+import { Message } from "../lsp/messages";
 
 class Logger {
   protected static rootDirectory: string = process.cwd();
