@@ -23,7 +23,7 @@ Clone this repository and `cd` into it. Then build the project by running the fo
 You will have to find out on how your favourite editor/IDE connects to language servers on your own. Having said that, the following works for me in Neovim v0.10.3.
 
 <details>
-  <summary>Neovim configuration</summary><!-- --+ -->
+  <summary>Click for Neovim configuration</summary><!-- --+ -->
 
 ```lua
 -- Paste this in your init.lua file
