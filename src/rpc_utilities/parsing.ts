@@ -1,5 +1,10 @@
 import { EventEmitter } from "events";
-import { RequestMessage, MessageQueue } from "../lsp/messages";
+import {
+  RequestMessage,
+  MessageQueue,
+  ResponseMessage,
+  NotificationMessage,
+} from "../lsp/messages";
 
 export const decodeStdin = (
   queue: MessageQueue,
@@ -80,12 +85,10 @@ export const getContentLength = (
   };
 };
 
-export const parseMessage = (contentBytes: Buffer): RequestMessage => {
+export const parseMessage = (
+  contentBytes: Buffer,
+): RequestMessage | NotificationMessage => {
   const content = JSON.parse(contentBytes.toString("utf8"));
-
-  if (typeof content.id !== "number") {
-    throw new Error("The 'id' property is missing or is not a number.");
-  }
 
   if (typeof content.method !== "string") {
     throw new Error("The 'method' property is missing or is not a string.");
@@ -94,7 +97,7 @@ export const parseMessage = (contentBytes: Buffer): RequestMessage => {
   return content;
 };
 
-export const encodeMessage = (msg: Record<string, unknown>): Buffer => {
+export const encodeMessage = (msg: ResponseMessage): Buffer => {
   const content = JSON.stringify(msg);
   const contentBytes = Buffer.from(content, "utf8");
 

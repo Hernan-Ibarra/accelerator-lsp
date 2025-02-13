@@ -14,8 +14,8 @@ const main = (): void => {
     while (!parsedMessages.isEmpty()) {
       const msg = parsedMessages.dequeue();
       if (msg) {
-        messageLogger.logMessage(msg);
-        handleMessage(msg);
+        messageLogger.logMessage(msg, "received");
+        handleMessage(msg, messageLogger);
       }
     }
   });

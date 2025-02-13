@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { Message } from "../lsp/messages";
 
-class Logger {
+export class Logger {
   protected static rootDirectory: string = process.cwd();
   protected logFilePath: string;
   protected stream: fs.WriteStream;
@@ -58,9 +58,15 @@ export class MessageLogger extends Logger {
     }
   }
 
-  logMessage(message: Message) {
-    this.log(
-      `Message Received\n\`\`\`json\n${JSON.stringify(message, null, "\t")}\n\`\`\`\n`,
-    );
+  logMessage(message: Message, sentOrReceived: "sent" | "received") {
+    if (sentOrReceived === "sent") {
+      this.log(
+        `Message Sent\n\`\`\`json\n${JSON.stringify(message, null, "\t")}\n\`\`\`\n`,
+      );
+    } else if (sentOrReceived === "received") {
+      this.log(
+        `Message Received\n\`\`\`json\n${JSON.stringify(message, null, "\t")}\n\`\`\`\n`,
+      );
+    }
   }
 }

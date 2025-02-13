@@ -1,5 +1,9 @@
 import { EventEmitter } from "events";
-import { MessageQueue } from "../../lsp/messages";
+import {
+  MessageQueue,
+  RequestMessage,
+  ResponseMessage,
+} from "../../lsp/messages";
 import {
   AttemptToGetContentLength,
   decodeStdin,
@@ -14,6 +18,7 @@ describe("Parsing Utilities", () => {
     const exampleMessage = {
       id: 54,
       method: "textDocument/completion",
+      jsonrpc: "2.0",
     };
     const exampleMessageBytes = Buffer.from(
       JSON.stringify(exampleMessage),
@@ -25,7 +30,8 @@ describe("Parsing Utilities", () => {
   });
 
   test("Get Content Lenght", () => {
-    const content = '{"id":1,"method":"textDocument/completion"}';
+    const content =
+      '{"id":1,"method":"textDocument/completion","jsonrpc":"2.0"}';
     const contentBytes = Buffer.from(content);
     const receivedBytes = Buffer.from(
       `Content-Length: ${contentBytes.length}\r\n\r\n${content}`,
@@ -41,42 +47,42 @@ describe("Parsing Utilities", () => {
   });
 
   test("Encode message", () => {
-    const exampleMessage = {
+    const exampleMessage: ResponseMessage = {
       id: 1,
-      method: "textDocument/completion",
+      jsonrpc: "2.0",
     };
 
     const encoded = encodeMessage(exampleMessage);
 
     expect(encoded).toStrictEqual(
-      Buffer.from(
-        'Content-Length: 43\r\n\r\n{"id":1,"method":"textDocument/completion"}',
-        "utf8",
-      ),
+      Buffer.from('Content-Length: 24\r\n\r\n{"id":1,"jsonrpc":"2.0"}', "utf8"),
     );
   });
 
   test("Decode stdin", () => {
-    const exampleMessage1 = {
-      id: 1,
+    const exampleMessage1: RequestMessage = {
+      jsonrpc: "2.0",
       method: "textDocument/completion",
+      id: 1,
     };
-    const exampleMessage2 = {
+    const exampleMessage2: RequestMessage = {
+      jsonrpc: "2.0",
+      method: "textDocument/completion",
       id: 2,
-      method: "textDocument/hover",
     };
-    const exampleMessage3 = {
+    const exampleMessage3: RequestMessage = {
+      jsonrpc: "2.0",
+      method: "textDocument/completion",
       id: 3,
-      method: "textDocument/signatureHelp",
     };
 
     const exampleMessageBytes1 = encodeMessage(exampleMessage1);
     const exampleMessageBytes2 = encodeMessage(exampleMessage2);
     const exampleMessageBytes3 = encodeMessage(exampleMessage3);
 
-    expect(exampleMessageBytes1.length).toBe(65);
-    expect(exampleMessageBytes2.length).toBe(60);
-    expect(exampleMessageBytes3.length).toBe(68);
+    expect(exampleMessageBytes1.length).toBe(81);
+    expect(exampleMessageBytes2.length).toBe(81);
+    expect(exampleMessageBytes3.length).toBe(81);
 
     const allBytes = Buffer.concat([
       exampleMessageBytes1,
@@ -95,23 +101,23 @@ describe("Parsing Utilities", () => {
       ++messagesReceived;
     });
 
-    mockStdin.send(allBytes.subarray(0, 30));
+    mockStdin.send(allBytes.subarray(0, 50));
     expect(messagesReceived).toBe(0);
     expect(queue.isEmpty()).toBe(true);
 
-    mockStdin.send(allBytes.subarray(30, 70));
+    mockStdin.send(allBytes.subarray(50, 100));
     expect(messagesReceived).toBe(1);
     expect(queue.size()).toBe(1);
     expect(queue.dequeue()).toStrictEqual(exampleMessage1);
     expect(queue.size()).toBe(0);
 
-    mockStdin.send(allBytes.subarray(70, 65 + 60));
+    mockStdin.send(allBytes.subarray(100, 81 + 81));
     expect(messagesReceived).toBe(2);
     expect(queue.size()).toBe(1);
     expect(queue.dequeue()).toStrictEqual(exampleMessage2);
     expect(queue.size()).toBe(0);
 
-    mockStdin.send(allBytes.subarray(65 + 60));
+    mockStdin.send(allBytes.subarray(81 + 81));
     expect(messagesReceived).toBe(3);
     expect(queue.size()).toBe(1);
     expect(queue.dequeue()).toStrictEqual(exampleMessage3);
