@@ -60,7 +60,7 @@ export class MessageLogger extends Logger {
 
   logMessage(message: Message) {
     this.log(
-      `Message Received\n\`\`\`json\n${JSON.stringify(message, null, "\t")}\`\`\`\n`,
+      `Message Received\n\`\`\`json\n${JSON.stringify(message, null, "\t")}\n\`\`\`\n`,
     );
   }
 }
