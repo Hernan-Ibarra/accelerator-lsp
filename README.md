@@ -20,16 +20,27 @@ Clone this repository and `cd` into it. Then build the project by running the fo
 
 ### Connecting to a client
 
-You will have to find out on how your favourite editor/IDE connects to language servers on your own. Having said that, the following configuration works for me in Neovim v0.10.3.
+You will have to find out on how your favourite editor/IDE connects to language servers on your own. Having said that, the following works for me in Neovim v0.10.3.
+
+<details>
+  <summary>Neovim configuration</summary><!-- --+ -->
 
 ```lua
 -- Paste this in your init.lua file
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.accelerator' },
+
+-- This matches *.accelerator files and sets the filetype to acceleratorscript.
+vim.filetype.add {
+  extension = {
+    accelerator = 'acceleratorscript',
+  },
+}
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'acceleratorscript',
   callback = function()
-    -- TODO: Change this to the path to this respository on your machine
+    -- TODO: Change to this respository's path on your machine
     -- Use absolute paths (so no ~ or $HOME) since it may not work otherwise
-    local path = 'path/to/the/repo/'
+    local path = '/path/to/the/repo/accelerator-lsp'
     local command = { 'npm', 'run', '--silent', '--prefix', path, 'start' }
 
     local client = vim.lsp.start { name = 'accelerator-lsp', cmd = command }
@@ -40,10 +51,13 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
     end
 
     vim.lsp.buf_attach_client(0, client)
-    print 'accelerator language server connected!'
+    print 'accelerator language server found'
   end,
 })
 ```
+
+<!-- --_ -->
+</details>
 
 ### Playground
 
@@ -63,5 +77,5 @@ Will reveal after the presentation ;)
 
 - [Building an LSP from Scratch](https://www.youtube.com/watch?v=YsdlcQoHqPY). This video inspired this project.
 - [LSP Specifications](https://microsoft.github.io/language-server-protocol/specifications/specification-current). The documentation is actually pretty good!
-- [Why LSP?](https://matklad.github.io/2022/04/25/why-lsp.html) and [LSP could have been better](https://matklad.github.io/2023/10/12/lsp-could-have-been-better.html). Interesting takes on LSP by [matklad](https://matklad.github.io/about.html).
+- [Why LSP?](https://matklad.github.io/2022/04/25/why-lsp.html) and [LSP could have been better](https://matklad.github.io/2023/10/12/lsp-could-have-been-better.html). Interesting takes on LSP.
 - [LSP-AI](https://github.com/SilasMarvin/lsp-ai). An interesting alternative to technology like Copilot. (Maybe even the future of AI-assisted coding?).
