@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "clean": "echo \"We now delete the cache from previous compilations\" && rm -frI dist && echo \"We now delete previous logs\" && rm -frI logs/*",
-    "build": "tsc",
+    "build": "tsc && mkdir -p logs",
     "rebuild": "npm run clean && npm run build",
     "start": "node dist/main.js",
     "test": "jest",

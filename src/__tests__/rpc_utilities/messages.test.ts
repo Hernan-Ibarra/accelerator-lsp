@@ -11,14 +11,17 @@ describe("MessageQueue", () => {
     exampleMessage1 = {
       id: 1,
       method: "textDocument/completion",
+      jsonrpc: "2.0",
     };
     exampleMessage2 = {
       id: 2,
       method: "textDocument/hover",
+      jsonrpc: "2.0",
     };
     exampleMessage3 = {
       id: 3,
       method: "textDocument/signatureHelp",
+      jsonrpc: "2.0",
     };
   });
 
