@@ -4,7 +4,7 @@
   "description": "This is an language server I built for educational purposes.",
   "main": "main.js",
   "scripts": {
-    "clean": "echo \"We now delete the cache from previous compilations\" && rm -frI dist && echo \"We now delete previous logs\" && rm -frI logs/*",
+    "clean": "echo \"We now delete the cache from previous compilations\" && rm -frI dist && echo \"We now delete previous logs\" && rm -frI logs",
     "build": "tsc && mkdir -p logs",
     "rebuild": "npm run clean && npm run build",
     "start": "node dist/main.js",
