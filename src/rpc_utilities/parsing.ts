@@ -1,10 +1,10 @@
 import { EventEmitter } from "events";
 import {
   RequestMessage,
-  MessageQueue,
   ResponseMessage,
   NotificationMessage,
-} from "../lsp/messages";
+} from "../lsp/messageTypes/generic";
+import { MessageQueue } from "../lsp/messageQueue";
 
 export const decodeStdin = (
   queue: MessageQueue,

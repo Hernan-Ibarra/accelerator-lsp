@@ -1,4 +1,5 @@
-import { RequestMessage, MessageQueue } from "../../lsp/messages";
+import { MessageQueue } from "../../lsp/messageQueue";
+import { RequestMessage } from "../../lsp/messageTypes/generic";
 
 describe("MessageQueue", () => {
   let exampleQueue: MessageQueue;

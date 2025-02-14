@@ -1,9 +1,8 @@
 import { EventEmitter } from "events";
 import {
-  MessageQueue,
   RequestMessage,
   ResponseMessage,
-} from "../../lsp/messages";
+} from "../../lsp/messageTypes/generic";
 import {
   AttemptToGetContentLength,
   decodeStdin,
@@ -12,6 +11,7 @@ import {
   parseMessage,
 } from "../../rpc_utilities/parsing";
 import { stdin as mstdin } from "mock-stdin";
+import { MessageQueue } from "../../lsp/messageQueue";
 
 describe("Parsing Utilities", () => {
   test("Parse Message", () => {

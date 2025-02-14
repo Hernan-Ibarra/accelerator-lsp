@@ -1,14 +1,13 @@
 import { Logger, MessageLogger } from "../logging/loggers";
 import { encodeMessage } from "../rpc_utilities/parsing";
+import { ClientMessage } from "./messageTypes/generic";
 import {
   InitializeRequest,
   initializeResponse,
-  NotificationMessage,
-  RequestMessage,
-} from "./messages";
+} from "./messageTypes/specific/init";
 
 export const handleMessage = (
-  msg: RequestMessage | NotificationMessage,
+  msg: ClientMessage,
   messageLogger: MessageLogger,
 ) => {
   const messageHandlingLogger = new Logger("message-handling.log");
@@ -35,7 +34,10 @@ const handleInitRequest = (
   );
   const response: initializeResponse = {
     result: {
-      capabilities: {},
+      capabilities: {
+        textDocumentSync: 1,
+        hoverProvider: true,
+      },
       serverInfo: {
         name: "accelerator-lsp",
         version: "0.1.0",

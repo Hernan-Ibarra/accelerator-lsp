@@ -1,8 +1,8 @@
 import { EventEmitter } from "events";
 import { handleMessage } from "./lsp/handleMessage";
-import { MessageQueue } from "./lsp/messages";
 import { decodeStdin } from "./rpc_utilities/parsing";
 import { MessageLogger } from "./logging/loggers";
+import { MessageQueue } from "./lsp/messageQueue";
 
 const main = (): void => {
   const parsedMessages = new MessageQueue();

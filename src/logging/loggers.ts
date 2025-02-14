@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { Message } from "../lsp/messages";
+import { ClientMessage, ServerMessage } from "../lsp/messageTypes/generic";
 
 export class Logger {
   protected static rootDirectory: string = process.cwd();
@@ -58,7 +58,10 @@ export class MessageLogger extends Logger {
     }
   }
 
-  logMessage(message: Message, sentOrReceived: "sent" | "received") {
+  logMessage(
+    message: ServerMessage | ClientMessage,
+    sentOrReceived: "sent" | "received",
+  ) {
     if (sentOrReceived === "sent") {
       this.log(
         `Message Sent\n\`\`\`json\n${JSON.stringify(message, null, "\t")}\n\`\`\`\n`,
