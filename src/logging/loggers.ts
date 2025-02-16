@@ -49,7 +49,7 @@ export class MessageLogger extends Logger {
 
     if (isFileEmpty) {
       this.stream.write(
-        "<!-- vim:set filetype=markdown foldmethod=indent: -->\n# Message History\n\n",
+        "<!-- vim:set filetype=markdown foldmethod=indent readonly: -->\n# Message History\n\n",
       );
     } else {
       this.stream.write(

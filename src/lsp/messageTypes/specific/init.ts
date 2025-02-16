@@ -37,7 +37,7 @@ interface ServerInfo {
 export const isInitializeRequest = (
   msg: ClientMessage,
 ): msg is InitializeRequest => {
-  if (!("method" in msg && msg["method"] !== "initialize")) {
+  if (!("method" in msg && msg["method"] === "initialize")) {
     return false;
   }
 
