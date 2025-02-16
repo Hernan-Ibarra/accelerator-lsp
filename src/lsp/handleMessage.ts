@@ -11,6 +11,11 @@ import {
   isDidOpenNotification,
 } from "./messageTypes/specific/didOpen";
 import {
+  HoverRequest,
+  HoverResponse,
+  isHoverRequest,
+} from "./messageTypes/specific/hover";
+import {
   InitializeRequest,
   initializeResponse,
   isInitializeRequest,
@@ -58,8 +63,21 @@ export const handleMessage = (
       }
       break;
     }
+    case "textDocument/hover": {
+      if (isHoverRequest(msg)) {
+        handleHoverRequest(msg, state, messageHandlingLogger, messageLogger);
+      } else {
+        messageHandlingLogger.error(
+          "Received message with method 'textDocument/hover' but the message structure did not match",
+        );
+      }
+      break;
+    }
 
     default:
+      messageHandlingLogger.warn(
+        `Do not know how to handle messages with method ${msg.method}.`,
+      );
       break;
   }
 };
@@ -70,7 +88,7 @@ const handleInitRequest = (
   messageLogger: MessageLogger,
 ): void => {
   messageHandlingLogger.info(
-    `Replying to initialization request from ${initRequest.params.clientInfo?.name} ${initRequest.params.clientInfo?.version}`,
+    `Received initialization request from ${initRequest.params.clientInfo?.name} ${initRequest.params.clientInfo?.version}. Replying...`,
   );
   const response: initializeResponse = {
     result: {
@@ -92,6 +110,9 @@ const handleInitRequest = (
   const encoded = encodeMessage(response);
   process.stdout.write(encoded);
   messageLogger.logMessage(response, "sent");
+  messageHandlingLogger.info(
+    `Replied to initialization request from ${initRequest.params.clientInfo?.name} ${initRequest.params.clientInfo?.version}`,
+  );
 };
 
 const handleDidOpenNotification = (
@@ -118,8 +139,32 @@ const handleDidChangeNotification = (
   messageHandlingLogger.info(
     `The document ${params.textDocument.uri} has changed to version ${params.textDocument.version}\n\n`,
   );
-  state.update(
-    params.textDocument.uri,
-    params.contentChanges[params.contentChanges.length - 1].text,
+  params.contentChanges.forEach((change) => {
+    state.update(params.textDocument.uri, change.text);
+  });
+};
+
+const handleHoverRequest = (
+  hoverRequest: HoverRequest,
+  state: State,
+  messageHandlingLogger: Logger,
+  messageLogger: MessageLogger,
+): void => {
+  // TODO: Log the actual word the client is requesting info about.
+  messageHandlingLogger.info(`Received hover request from client. Replying...`);
+  const hoverInfo: string | undefined = state.provideHoverInfo(
+    hoverRequest.params.textDocument.uri,
+    hoverRequest.params.position,
   );
+  const response: HoverResponse = {
+    jsonrpc: "2.0",
+    id: hoverRequest.id,
+    result: hoverInfo ? { contents: hoverInfo } : null,
+  };
+  const encoded = encodeMessage(response);
+  process.stdout.write(encoded);
+  messageHandlingLogger.info(
+    `Replied to hover request with "${response.result ? response.result.contents : "null"}"`,
+  );
+  messageLogger.logMessage(response, "sent");
 };

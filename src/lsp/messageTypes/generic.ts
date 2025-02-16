@@ -10,7 +10,7 @@ export interface RequestMessage extends Message {
 
 export interface ResponseMessage extends Message {
   id: number | string | null;
-  result?: object;
+  result?: unknown;
   //error?: ResponseError
 }
 

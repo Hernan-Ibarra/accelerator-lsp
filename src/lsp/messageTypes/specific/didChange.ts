@@ -14,9 +14,12 @@ interface TextDocumentContentChangeEvent {
   text: string;
 }
 
-export interface VersionedDocumentIdentifier {
-  version: number;
+export interface TextDocumentIdentifier {
   uri: string;
+}
+
+export interface VersionedDocumentIdentifier extends TextDocumentIdentifier {
+  version: number;
 }
 
 export const isDidChangeNotification = (
@@ -59,6 +62,15 @@ export const isDidChangeNotification = (
   return true;
 };
 
+export const isTextDocumentIdentifier = (
+  textDocument: object,
+): textDocument is TextDocumentIdentifier => {
+  if (!("uri" in textDocument && typeof textDocument.uri === "string")) {
+    return false;
+  }
+  return true;
+};
+
 export const isVersionedDocumentIdentifier = (
   textDocument: unknown,
 ): textDocument is VersionedDocumentIdentifier => {
@@ -67,13 +79,14 @@ export const isVersionedDocumentIdentifier = (
   }
 
   if (
-    !("version" in textDocument && typeof textDocument.version === "string")
+    !("version" in textDocument && typeof textDocument.version === "number")
   ) {
     return false;
   }
 
-  if (!("uri" in textDocument && typeof textDocument.uri === "string")) {
+  if (!isTextDocumentIdentifier(textDocument)) {
     return false;
   }
+
   return true;
 };

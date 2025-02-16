@@ -25,7 +25,7 @@ export const isDidOpenNotification = (
     return false;
   }
 
-  if (!(msg.params !== undefined && msg.params !== null)) {
+  if (msg.params === undefined || msg.params === null) {
     return false;
   }
 
