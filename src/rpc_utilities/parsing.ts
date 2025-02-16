@@ -1,10 +1,11 @@
 import { EventEmitter } from "events";
 import {
-  RequestMessage,
-  ResponseMessage,
-  NotificationMessage,
+  ClientMessage,
+  isClientMessage,
+  ServerMessage,
 } from "../lsp/messageTypes/generic";
 import { MessageQueue } from "../lsp/messageQueue";
+import { Logger } from "../logging/loggers";
 
 export const decodeStdin = (
   queue: MessageQueue,
@@ -47,8 +48,10 @@ export const decodeStdin = (
       bytesToProcess.subarray(0, contentLength),
     );
 
-    queue.enqueue(parsedMessage);
-    emitter.emit("messageEnqueued");
+    if (parsedMessage !== undefined) {
+      queue.enqueue(parsedMessage);
+      emitter.emit("messageEnqueued");
+    }
 
     streamState.unprocessedBytes = bytesToProcess.subarray(contentLength);
     streamState.numberOfBytesExpected = undefined;
@@ -87,17 +90,29 @@ export const getContentLength = (
 
 export const parseMessage = (
   contentBytes: Buffer,
-): RequestMessage | NotificationMessage => {
-  const content = JSON.parse(contentBytes.toString("utf8"));
+): ClientMessage | undefined => {
+  const parsingLogger = new Logger("parsing.log");
 
-  if (typeof content.method !== "string") {
-    throw new Error("The 'method' property is missing or is not a string.");
+  let content;
+  try {
+    content = JSON.parse(contentBytes.toString("utf8"));
+  } catch {
+    parsingLogger.error("Could not parse bytes");
+    return;
   }
 
-  return content;
+  if (isClientMessage(content)) {
+    parsingLogger.info(`Succesfully parsed client message: ${content.method}`);
+    return content;
+  } else {
+    parsingLogger.error(
+      "The bytes were parsed but they did not look like a client message",
+    );
+    return;
+  }
 };
 
-export const encodeMessage = (msg: ResponseMessage): Buffer => {
+export const encodeMessage = (msg: ServerMessage): Buffer => {
   const content = JSON.stringify(msg);
   const contentBytes = Buffer.from(content, "utf8");
 

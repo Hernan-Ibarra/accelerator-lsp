@@ -1,4 +1,4 @@
-import { RequestMessage, ResponseMessage } from "../generic";
+import { ClientMessage, RequestMessage, ResponseMessage } from "../generic";
 
 export type InitializeRequest = {
   method: "initialize";
@@ -33,3 +33,34 @@ interface ServerInfo {
   name: string;
   version: string;
 }
+
+export const isInitializeRequest = (
+  msg: ClientMessage,
+): msg is InitializeRequest => {
+  if (!("method" in msg && msg["method"] !== "initialize")) {
+    return false;
+  }
+
+  if (msg["params"] !== undefined) {
+    return isInitializeParams(msg["params"]);
+  }
+
+  return true;
+};
+
+const isInitializeParams = (params: object): params is InitializeParams => {
+  if ("clientInfo" in params) {
+    const clientInfo = params.clientInfo;
+    if (typeof clientInfo !== "object" || clientInfo === null) {
+      return false;
+    }
+    if (!("name" in clientInfo && typeof "name" === "string")) {
+      return false;
+    }
+    if ("version" in clientInfo && typeof clientInfo.version !== "string") {
+      return false;
+    }
+  }
+
+  return true;
+};
