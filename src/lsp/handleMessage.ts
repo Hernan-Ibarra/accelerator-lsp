@@ -3,6 +3,12 @@ import { Logger, MessageLogger } from "../logging/loggers";
 import { encodeMessage } from "../rpc_utilities/parsing";
 import { ClientMessage } from "./messageTypes/generic";
 import {
+  CodeAction,
+  CodeActionRequest,
+  CodeActionResponse,
+  isCodeActionRequest,
+} from "./messageTypes/specific/codeAction";
+import {
   DidChangeNotification,
   isDidChangeNotification,
 } from "./messageTypes/specific/didChange";
@@ -74,6 +80,22 @@ export const handleMessage = (
       break;
     }
 
+    case "textDocument/codeAction": {
+      if (isCodeActionRequest(msg)) {
+        handleCodeActionRequest(
+          msg,
+          state,
+          messageHandlingLogger,
+          messageLogger,
+        );
+      } else {
+        messageHandlingLogger.error(
+          "Received message with method 'textDocument/codeAction' but the message structure did not match",
+        );
+      }
+      break;
+    }
+
     default:
       messageHandlingLogger.warn(
         `Do not know how to handle messages with method ${msg.method}.`,
@@ -95,9 +117,8 @@ const handleInitRequest = (
       capabilities: {
         textDocumentSync: 1,
         hoverProvider: true,
+        codeActionProvider: true,
         //CompletionProvider: map[string]any{},
-        //DefinitionProvider: true,
-        //CodeActionProvider: true,
       },
       serverInfo: {
         name: "accelerator-lsp",
@@ -166,5 +187,29 @@ const handleHoverRequest = (
   messageHandlingLogger.info(
     `Replied to hover request with "${response.result ? response.result.contents : "null"}"`,
   );
+  messageLogger.logMessage(response, "sent");
+};
+
+const handleCodeActionRequest = (
+  codeActionRequest: CodeActionRequest,
+  state: State,
+  messageHandlingLogger: Logger,
+  messageLogger: MessageLogger,
+): void => {
+  messageHandlingLogger.info(
+    `Received code action request from client. Replying...`,
+  );
+  const uri = codeActionRequest.params.textDocument.uri;
+  const codeActions: CodeAction[] | undefined = state.provideCodeActions(uri);
+
+  const response: CodeActionResponse = {
+    jsonrpc: "2.0",
+    id: codeActionRequest.id,
+    result: codeActions ? codeActions : null,
+  };
+
+  const encoded = encodeMessage(response);
+  process.stdout.write(encoded);
+  messageHandlingLogger.info(`Replied to code action request`);
   messageLogger.logMessage(response, "sent");
 };

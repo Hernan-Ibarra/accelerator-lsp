@@ -1,3 +1,4 @@
+import { CodeAction } from "../lsp/messageTypes/specific/codeAction";
 import { Position } from "../lsp/messageTypes/specific/hover";
 
 export class State {
@@ -7,11 +8,7 @@ export class State {
     this.documents = {};
   }
 
-  update(uri: string, text: string): void {
-    this.documents[uri] = text;
-  }
-
-  provideHoverInfo(uri: string, pos: Position): string | undefined {
+  getWordUnderCursor(uri: string, pos: Position) {
     const doc = this.documents[uri];
     const lines = doc.split("\n");
 
@@ -30,7 +27,13 @@ export class State {
 
     for (let index = pos.character; index < line.length; index++) {
       const char = line[index];
-      if (char.trim() === "") {
+      if (
+        char.trim() === "" ||
+        char === ":" ||
+        char === "=" ||
+        char === '"' ||
+        char === ";"
+      ) {
         break;
       }
       wordForward = wordForward.concat(char);
@@ -38,17 +41,29 @@ export class State {
 
     for (let index = pos.character - 1; index >= 0; index--) {
       const char = line[index];
-      if (char.trim() === "") {
+      if (
+        char.trim() === "" ||
+        char === ":" ||
+        char === "=" ||
+        char === '"' ||
+        char === ";"
+      ) {
         break;
       }
       wordBackward = char.concat(wordBackward);
     }
 
-    const word = wordBackward.concat(wordForward);
+    return wordBackward.concat(wordForward);
+  }
+
+  update(uri: string, text: string): void {
+    this.documents[uri] = text;
+  }
+
+  provideHoverInfo(uri: string, pos: Position): string | undefined {
+    const word = this.getWordUnderCursor(uri, pos);
 
     switch (word) {
-      case "VSCode":
-        return "Evil";
       case "Accelerator":
         return "A nice class of software engineers, working @THG";
       case "Neovim":
@@ -58,5 +73,61 @@ export class State {
       default:
         return undefined;
     }
+  }
+
+  provideCodeActions(uri: string): CodeAction[] | undefined {
+    const doc = this.documents[uri];
+    const regex = new RegExp(`\\bVSCode\\b`, "g");
+
+    const lines = doc.split("\n");
+
+    const lastLineLength = lines[lines.length - 1].length;
+
+    return [
+      {
+        title: "Censor VSC*de",
+        edit: {
+          changes: {
+            [uri]: [
+              {
+                range: {
+                  start: {
+                    line: 0,
+                    character: 0,
+                  },
+                  end: {
+                    line: lines.length - 1,
+                    character: lastLineLength - 1,
+                  },
+                },
+                newText: doc.replace(regex, "VSC*de"),
+              },
+            ],
+          },
+        },
+      },
+      {
+        title: "Replace for a better editor",
+        edit: {
+          changes: {
+            [uri]: [
+              {
+                range: {
+                  start: {
+                    line: 0,
+                    character: 0,
+                  },
+                  end: {
+                    line: lines.length - 1,
+                    character: lastLineLength - 1,
+                  },
+                },
+                newText: doc.replace(regex, "Neovim"),
+              },
+            ],
+          },
+        },
+      },
+    ];
   }
 }

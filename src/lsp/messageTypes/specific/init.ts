@@ -24,8 +24,7 @@ interface InitializeResult {
 interface ServerCapabilities {
   textDocumentSync: number;
   hoverProvider: boolean;
-  //definitionProvider: boolean;
-  //codeActionProvider: boolean;
+  codeActionProvider: boolean;
   //completionProvider: Record<string,any>;
 }
 

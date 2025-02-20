@@ -1,4 +1,4 @@
-import { handleMessage } from "../../lsp/handleMessage";
+//import { handleMessage } from "../../lsp/handleMessage";
 
 describe("Message Handling", () => {
   test("handleMessage", () => {});
