@@ -36,7 +36,8 @@ export class State {
         char === ":" ||
         char === "=" ||
         char === '"' ||
-        char === ";"
+        char === ";" ||
+        char === "."
       ) {
         break;
       }

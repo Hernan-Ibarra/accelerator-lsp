@@ -1,5 +1,5 @@
 import { NotificationMessage } from "../generic";
-import { Diagnostic, Range } from "./codeAction";
+import { Diagnostic } from "./codeAction";
 
 export type PublishDiagnosticsNotification = NotificationMessage & {
   method: "textDocument/publishDiagnostics";
