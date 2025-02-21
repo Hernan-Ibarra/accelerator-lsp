@@ -13,7 +13,7 @@ interface CodeActionParams {
   context: CodeActionContext;
 }
 
-interface Range {
+export interface Range {
   start: Position;
   end: Position;
 }
@@ -22,7 +22,7 @@ interface CodeActionContext {
   diagnostics: Diagnostic[];
 }
 
-interface Diagnostic {
+export interface Diagnostic {
   range: Range;
   severity?: 1 | 2 | 3 | 4;
   source?: string;

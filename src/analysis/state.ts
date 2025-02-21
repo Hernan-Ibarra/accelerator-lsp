@@ -1,4 +1,7 @@
-import { CodeAction } from "../lsp/messageTypes/specific/codeAction";
+import {
+  CodeAction,
+  Diagnostic,
+} from "../lsp/messageTypes/specific/codeAction";
 import { CompletionItem } from "../lsp/messageTypes/specific/completion";
 import { Position } from "../lsp/messageTypes/specific/hover";
 
@@ -58,8 +61,37 @@ export class State {
     return wordBackward.concat(wordForward);
   }
 
-  update(uri: string, text: string): void {
+  update(uri: string, text: string): Diagnostic[] {
     this.documents[uri] = text;
+    const doc = this.documents[uri];
+    const lines = doc.split("\n");
+
+    const diagnostics: Diagnostic[] = [];
+
+    for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+      const line = lines[lineNumber];
+      if (line.includes("VSCode")) {
+        const index = line.indexOf("VSCode");
+        const diagnostic: Diagnostic = {
+          message: 'Did you mean "Neovim"?',
+          source: "Trust me bro",
+          severity: 2,
+          range: {
+            start: {
+              line: lineNumber,
+              character: index,
+            },
+            end: {
+              line: lineNumber,
+              character: index + "VSCode".length,
+            },
+          },
+        };
+        diagnostics.push(diagnostic);
+      }
+    }
+
+    return diagnostics;
   }
 
   provideHoverInfo(uri: string, pos: Position): string | undefined {

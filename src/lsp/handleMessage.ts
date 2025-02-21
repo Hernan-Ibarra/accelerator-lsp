@@ -14,6 +14,7 @@ import {
   CompletionResponse,
   isCompletionRequest,
 } from "./messageTypes/specific/completion";
+import { PublishDiagnosticsNotification } from "./messageTypes/specific/diagnostics";
 import {
   DidChangeNotification,
   isDidChangeNotification,
@@ -57,7 +58,12 @@ export const handleMessage = (
     }
     case "textDocument/didOpen": {
       if (isDidOpenNotification(msg)) {
-        handleDidOpenNotification(msg, state, messageHandlingLogger);
+        handleDidOpenNotification(
+          msg,
+          state,
+          messageLogger,
+          messageHandlingLogger,
+        );
       } else {
         messageHandlingLogger.error(
           "Received message with method 'textDocument/didOpen' but the message structure did not match",
@@ -67,7 +73,12 @@ export const handleMessage = (
     }
     case "textDocument/didChange": {
       if (isDidChangeNotification(msg)) {
-        handleDidChangeNotification(msg, state, messageHandlingLogger);
+        handleDidChangeNotification(
+          msg,
+          state,
+          messageLogger,
+          messageHandlingLogger,
+        );
       } else {
         messageHandlingLogger.error(
           "Received message with method 'textDocument/didChange' but the message structure did not match",
@@ -163,18 +174,39 @@ const handleInitRequest = (
 const handleDidOpenNotification = (
   didOpenNotification: DidOpenNotification,
   state: State,
+  messageLogger: MessageLogger,
   messageHandlingLogger: Logger,
 ): void => {
   const docInfo = didOpenNotification.params.textDocument;
   messageHandlingLogger.info(
     `Client opened file ${docInfo.uri} written in language "${docInfo.languageId}". This is version ${docInfo.version} of the document`,
   );
-  state.update(docInfo.uri, docInfo.text);
+
+  const diagnostics = state.update(docInfo.uri, docInfo.text);
+
+  if (!diagnostics) {
+    return;
+  }
+
+  const notification: PublishDiagnosticsNotification = {
+    jsonrpc: "2.0",
+    method: "textDocument/publishDiagnostics",
+    params: {
+      uri: docInfo.uri,
+      diagnostics: diagnostics,
+    },
+  };
+  const encoded = encodeMessage(notification);
+  process.stdout.write(encoded);
+
+  messageHandlingLogger.info(`Sent diagnostics`);
+  messageLogger.logMessage(notification, "sent");
 };
 
 const handleDidChangeNotification = (
   didChangeNotification: DidChangeNotification,
   state: State,
+  messageLogger: MessageLogger,
   messageHandlingLogger: Logger,
 ): void => {
   const params = didChangeNotification.params;
@@ -185,7 +217,26 @@ const handleDidChangeNotification = (
     `The document ${params.textDocument.uri} has changed to version ${params.textDocument.version}\n\n`,
   );
   params.contentChanges.forEach((change) => {
-    state.update(params.textDocument.uri, change.text);
+    const docInfo = params.textDocument;
+    const diagnostics = state.update(docInfo.uri, change.text);
+
+    if (!diagnostics) {
+      return;
+    }
+
+    const notification: PublishDiagnosticsNotification = {
+      jsonrpc: "2.0",
+      method: "textDocument/publishDiagnostics",
+      params: {
+        uri: docInfo.uri,
+        diagnostics: diagnostics,
+      },
+    };
+    const encoded = encodeMessage(notification);
+    process.stdout.write(encoded);
+
+    messageHandlingLogger.info(`Sent diagnostics`);
+    messageLogger.logMessage(notification, "sent");
   });
 };
 
