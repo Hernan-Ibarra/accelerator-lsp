@@ -28,7 +28,7 @@ You will have to find out on how your favourite editor/IDE connects to language 
 ```lua
 -- Paste this in your init.lua file
 
-vim.api.nvim_create_autocmd({"BufEnter, BufWinEnter"}, {
+vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
   pattern = '*.accelerator',
   callback = function()
     -- TODO: Change to this respository's path on your machine
