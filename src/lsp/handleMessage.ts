@@ -9,6 +9,12 @@ import {
   isCodeActionRequest,
 } from "./messageTypes/specific/codeAction";
 import {
+  CompletionItem,
+  CompletionRequest,
+  CompletionResponse,
+  isCompletionRequest,
+} from "./messageTypes/specific/completion";
+import {
   DidChangeNotification,
   isDidChangeNotification,
 } from "./messageTypes/specific/didChange";
@@ -96,6 +102,22 @@ export const handleMessage = (
       break;
     }
 
+    case "textDocument/completion": {
+      if (isCompletionRequest(msg)) {
+        handleCompletionRequest(
+          msg,
+          state,
+          messageHandlingLogger,
+          messageLogger,
+        );
+      } else {
+        messageHandlingLogger.error(
+          "Received message with method 'textDocument/completion' but the message structure did not match",
+        );
+      }
+      break;
+    }
+
     default:
       messageHandlingLogger.warn(
         `Do not know how to handle messages with method ${msg.method}.`,
@@ -118,7 +140,9 @@ const handleInitRequest = (
         textDocumentSync: 1,
         hoverProvider: true,
         codeActionProvider: true,
-        //CompletionProvider: map[string]any{},
+        completionProvider: {
+          triggerCharacters: ["."],
+        },
       },
       serverInfo: {
         name: "accelerator-lsp",
@@ -211,5 +235,32 @@ const handleCodeActionRequest = (
   const encoded = encodeMessage(response);
   process.stdout.write(encoded);
   messageHandlingLogger.info(`Replied to code action request`);
+  messageLogger.logMessage(response, "sent");
+};
+
+const handleCompletionRequest = (
+  completionRequest: CompletionRequest,
+  state: State,
+  messageHandlingLogger: Logger,
+  messageLogger: MessageLogger,
+): void => {
+  messageHandlingLogger.info(
+    `Received code action request from client. Replying...`,
+  );
+  const uri = completionRequest.params.textDocument.uri;
+  const completionResult: CompletionItem[] | null = state.provideCompletion(
+    uri,
+    completionRequest.params.position,
+  );
+
+  const response: CompletionResponse = {
+    jsonrpc: "2.0",
+    id: completionRequest.id,
+    result: completionResult,
+  };
+
+  const encoded = encodeMessage(response);
+  process.stdout.write(encoded);
+  messageHandlingLogger.info(`Replied to completion request`);
   messageLogger.logMessage(response, "sent");
 };

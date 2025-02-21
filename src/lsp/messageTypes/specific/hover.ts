@@ -8,7 +8,7 @@ export type HoverRequest = {
 
 interface HoverParams extends TextDocumentPositionParams {}
 
-interface TextDocumentPositionParams {
+export interface TextDocumentPositionParams {
   textDocument: TextDocumentIdentifier;
   position: Position;
 }

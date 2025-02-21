@@ -22,10 +22,12 @@ interface InitializeResult {
 }
 
 interface ServerCapabilities {
-  textDocumentSync: number;
-  hoverProvider: boolean;
-  codeActionProvider: boolean;
-  //completionProvider: Record<string,any>;
+  textDocumentSync?: number;
+  hoverProvider?: boolean;
+  codeActionProvider?: boolean;
+  completionProvider?: {
+    triggerCharacters?: string[];
+  };
 }
 
 interface ServerInfo {
