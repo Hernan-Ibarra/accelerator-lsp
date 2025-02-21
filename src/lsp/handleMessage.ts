@@ -184,7 +184,7 @@ const handleDidOpenNotification = (
 
   const diagnostics = state.update(docInfo.uri, docInfo.text);
 
-  if (!diagnostics) {
+  if (diagnostics.length === 0) {
     return;
   }
 
@@ -220,7 +220,7 @@ const handleDidChangeNotification = (
     const docInfo = params.textDocument;
     const diagnostics = state.update(docInfo.uri, change.text);
 
-    if (!diagnostics) {
+    if (diagnostics.length === 0) {
       return;
     }
 
