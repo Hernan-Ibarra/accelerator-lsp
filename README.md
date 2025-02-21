@@ -20,7 +20,7 @@ Clone this repository and `cd` into it. Then build the project by running the fo
 
 ### Connecting to a client
 
-You will have to find out on how your favourite editor/IDE connects to language servers on your own. Having said that, the following works for me in Neovim v0.10.3.
+You will have to find out on how your favourite editor/IDE connects to language servers on your own. Having said that, the following should work in Neovim.
 
 <details>
   <summary>Click for Neovim configuration</summary><!-- --+ -->
@@ -28,15 +28,8 @@ You will have to find out on how your favourite editor/IDE connects to language 
 ```lua
 -- Paste this in your init.lua file
 
--- This matches *.accelerator files and sets the filetype to acceleratorscript.
-vim.filetype.add {
-  extension = {
-    accelerator = 'acceleratorscript',
-  },
-}
-
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'acceleratorscript',
+vim.api.nvim_create_autocmd({"BufEnter, BufWinEnter"}, {
+  pattern = '*.accelerator',
   callback = function()
     -- TODO: Change to this respository's path on your machine
     -- Use absolute paths (so no ~ or $HOME) since it may not work otherwise
