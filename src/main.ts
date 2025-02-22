@@ -11,7 +11,6 @@ const main = (): void => {
   const messageLogger = new MessageLogger("message-history.log");
   const state = new State();
 
-  decodeStdin(parsedMessages, queueListener);
   queueListener.on("messageEnqueued", () => {
     while (!parsedMessages.isEmpty()) {
       const msg = parsedMessages.dequeue();
@@ -21,6 +20,8 @@ const main = (): void => {
       }
     }
   });
+
+  decodeStdin(parsedMessages, queueListener);
 };
 
 main();

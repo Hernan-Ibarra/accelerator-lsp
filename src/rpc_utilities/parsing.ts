@@ -7,55 +7,66 @@ import {
 import { MessageQueue } from "../lsp/messageQueue";
 import { Logger } from "../logging/loggers";
 
+interface StreamState {
+  unprocessedBytes: Buffer;
+  numberOfBytesExpected?: number;
+}
 export const decodeStdin = (
   queue: MessageQueue,
   emitter: EventEmitter,
 ): void => {
-  interface StreamState {
-    unprocessedBytes: Buffer;
-    numberOfBytesExpected?: number;
-  }
-
   const streamState: StreamState = {
     unprocessedBytes: Buffer.alloc(0),
   };
 
+  const rawLogger: Logger = new Logger("raw.log");
+
   process.stdin.on("data", (input: Buffer) => {
-    let bytesToProcess: Buffer = Buffer.concat([
-      streamState.unprocessedBytes,
-      input,
-    ]);
-    let contentLength = streamState.numberOfBytesExpected;
+    rawLogger.log(input.toString("utf8"));
+    handleData(input, streamState, queue, emitter);
+  });
+};
 
-    if (!contentLength) {
-      const attemptToGetContentLength = getContentLength(bytesToProcess);
-      if (attemptToGetContentLength.wasSuccesful) {
-        bytesToProcess = attemptToGetContentLength.contentBytes;
-        contentLength = attemptToGetContentLength.result;
-      } else {
-        streamState.unprocessedBytes = bytesToProcess;
-        return;
-      }
-    }
+const handleData = (
+  input: Buffer,
+  streamState: StreamState,
+  queue: MessageQueue,
+  emitter: EventEmitter,
+) => {
+  let bytesToProcess: Buffer = Buffer.concat([
+    streamState.unprocessedBytes,
+    input,
+  ]);
+  let contentLength = streamState.numberOfBytesExpected;
 
-    if (bytesToProcess.length < contentLength) {
+  if (!contentLength) {
+    const attemptToGetContentLength = getContentLength(bytesToProcess);
+    if (attemptToGetContentLength.wasSuccesful) {
+      bytesToProcess = attemptToGetContentLength.contentBytes;
+      contentLength = attemptToGetContentLength.result;
+    } else {
       streamState.unprocessedBytes = bytesToProcess;
-      streamState.numberOfBytesExpected = contentLength;
       return;
     }
+  }
 
-    const parsedMessage = parseMessage(
-      bytesToProcess.subarray(0, contentLength),
-    );
+  if (bytesToProcess.length < contentLength) {
+    streamState.unprocessedBytes = bytesToProcess;
+    streamState.numberOfBytesExpected = contentLength;
+    return;
+  }
 
-    if (parsedMessage !== undefined) {
-      queue.enqueue(parsedMessage);
-      emitter.emit("messageEnqueued");
-    }
+  const parsedMessage = parseMessage(bytesToProcess.subarray(0, contentLength));
 
-    streamState.unprocessedBytes = bytesToProcess.subarray(contentLength);
-    streamState.numberOfBytesExpected = undefined;
-  });
+  if (parsedMessage !== undefined) {
+    queue.enqueue(parsedMessage);
+    emitter.emit("messageEnqueued");
+  }
+
+  streamState.unprocessedBytes = bytesToProcess.subarray(contentLength);
+  streamState.numberOfBytesExpected = undefined;
+
+  handleData(Buffer.alloc(0), streamState, queue, emitter);
 };
 
 export type AttemptToGetContentLength =
